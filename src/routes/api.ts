@@ -1,17 +1,16 @@
-import { Hono } from 'hono'
-import { describeRoute } from 'hono-openapi'
-// You can import these for your preferred validation library
+import { Hono } from 'hono';
+import { describeRoute } from 'hono-openapi';
 import {
     resolver,
     validator as vValidator,
-} from 'hono-openapi/valibot'
+} from 'hono-openapi/valibot';
 
-const app = new Hono()
+const app = new Hono<{ Bindings: Env }>();
 
 app.get(
     '/',
     describeRoute({
-        description: 'Say hello to the user',
+        description: "",
         responses: {
             200: {
                 description: 'Successful response',
