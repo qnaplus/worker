@@ -1,0 +1,41 @@
+{
+  "name": "worker",
+  "private": true,
+  "license": "GPL-3.0-only",
+  "author": "battlesqui_d",
+  "version": "1.0.0",
+  "description": "worker service for qnaplus",
+  "homepage": "https://github.com/qnaplus/worker#readme",
+  "bugs": {
+    "url": "https://github.com/qnaplus/worker/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qnaplus/worker.git"
+  },
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "test": "vitest",
+    "cf-typegen": "wrangler types"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.6.4",
+    "@cloudflare/workers-types": "^4.20250214.0",
+    "typescript": "^5.5.2",
+    "vitest": "~2.1.9",
+    "wrangler": "^3.109.2"
+  },
+  "volta": {
+    "node": "22.13.1",
+    "yarn": "1.22.22"
+  },
+  "dependencies": {
+    "@hono/valibot-validator": "^0.5.2",
+    "@valibot/to-json-schema": "^1.0.0-rc.0",
+    "hono": "^4.7.2",
+    "hono-openapi": "^0.4.5",
+    "valibot": "^1.0.0-rc.1"
+  }
+}
