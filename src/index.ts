@@ -1,26 +1,45 @@
-/**
- * Welcome to Cloudflare Workers! This is your first worker.
- *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run `npm run deploy` to publish your worker
- *
- * Bind resources to your worker in `wrangler.jsonc`. After adding bindings, a type definition for the
- * `Env` object can be regenerated with `npm run cf-typegen`.
- *
- * Learn more at https://developers.cloudflare.com/workers/
- */
+import { apiReference } from "@scalar/hono-api-reference";
+import { Hono } from "hono";
+import { openAPISpecs } from "hono-openapi";
+import { getContext } from "hono/context-storage";
+import api from "./routes/api";
+import internal from "./routes/internal";
 
-export default {
-	async fetch(request, env, ctx): Promise<Response> {
-		const obj = await env.qnaplus.head("questions-development.json");
-		if (obj === null) {
-			return new Response("", { status: 500 })
-		}
-		if (obj.customMetadata?.version === undefined) {
-			return new Response("", { status: 500 });
-		}
-		return new Response(obj.customMetadata.version);
-	},
-} satisfies ExportedHandler<Env>;
+const app = new Hono<{ Bindings: Env }>();
 
+app.route("/internal", internal);
+app.route("/api", api);
+
+const { env } = getContext<{ Bindings: Env }>();
+const remote = env.ENVIRONMENT === "production"
+	? { url: "https://api.qnapl.us", description: "Production Server" }
+	: { url: "https://dev.api.qnapl.us", description: "Development Server" };
+
+const servers = [
+	{ url: "http://localhost:3000", description: "Local Server" },
+	remote
+];
+
+app.get(
+	"/openapi",
+	openAPISpecs(internal, {
+		documentation: {
+			info: {
+				title: "qnaplus",
+				version: "1.0.0",
+				description: "API for interacting with Q&A related resources.",
+			},
+			servers,
+		},
+	})
+)
+
+app.get(
+	"/docs",
+	apiReference({
+		theme: "saturn",
+		spec: { url: "/openapi" },
+	})
+);
+
+export default app

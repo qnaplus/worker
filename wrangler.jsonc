@@ -10,6 +10,9 @@
   "observability": {
     "enabled": true
   },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   /**
    * Smart Placement
    * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
@@ -26,12 +29,39 @@
       "binding": "qnaplus",
       "bucket_name": "qnaplus"
     }
-  ]
+  ],
+  "routes": [
+    {
+      "pattern": "api.qnapl.us",
+      "custom_domain": true
+    }
+  ],
+  "env": {
+    "dev": {
+      "vars": {
+        "ENVIRONMENT": "development"
+      },
+      "r2_buckets": [
+        {
+          "binding": "qnaplus",
+          "bucket_name": "qnaplus"
+        }
+      ],
+      "routes": [
+        {
+          "pattern": "dev.api.qnapl.us",
+          "custom_domain": true
+        }
+      ]
+    }
+  },
   /**
    * Environment Variables
    * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
    */
-  // "vars": { "MY_VARIABLE": "production_value" },
+  "vars": {
+    "ENVIRONMENT": "production"
+  }
   /**
    * Note: Use secrets to store sensitive data.
    * https://developers.cloudflare.com/workers/configuration/secrets/
