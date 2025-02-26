@@ -1,16 +1,19 @@
 import { Question } from "@qnaplus/scraper";
-import { apiReference } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
-import { describeRoute, openAPISpecs } from "hono-openapi";
+import { describeRoute } from "hono-openapi";
 import {
     resolver,
     validator as vValidator,
 } from "hono-openapi/valibot";
-import { getContext } from "hono/context-storage";
-import { object, string } from "valibot";
+import { array, object, string } from "valibot";
 import { questionSchema } from "../schemas";
+import { cors } from "hono/cors";
 
 export const internal = new Hono<{ Bindings: Env }>();
+
+internal.use("/*", cors({
+    origin: ["https://qnapl.us", "https://dev.qnapl.us"]
+}));
 
 internal.get(
     "/update",
@@ -30,7 +33,7 @@ internal.get(
                         schema: resolver(
                             object({
                                 version: string(),
-                                questions: questionSchema
+                                questions: array(questionSchema)
                             })
                         )
                     }
@@ -63,7 +66,7 @@ internal.get(
             return c.status(500);
         }
         const questions = await data.json<Question[]>();
-        return c.json({ version, questions }, 200);
+        return c.json({ version, questions });
     }
 )
 
