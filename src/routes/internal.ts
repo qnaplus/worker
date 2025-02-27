@@ -8,6 +8,7 @@ import {
 import { array, object, string } from "valibot";
 import { questionSchema } from "../schemas";
 import { cors } from "hono/cors";
+import tags from "../tags";
 
 export const internal = new Hono<{ Bindings: Env }>();
 
@@ -39,7 +40,8 @@ internal.get(
                     }
                 }
             }
-        }
+        },
+        tags: [tags.Internal]
     }),
     vValidator(
         "query",

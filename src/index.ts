@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { openAPISpecs } from "hono-openapi";
 import api from "./routes/api";
 import internal from "./routes/internal";
+import tags from "./tags";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -27,6 +28,12 @@ app.use(
 						description: c.env.ENVIRONMENT === "production"
 							? "Production Server"
 							: "Development Server"
+					}
+				],
+				tags: [
+					{
+						name: tags.Internal,
+						description: "Endpoints for internal operations."
 					}
 				]
 			},
