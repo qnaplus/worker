@@ -4,9 +4,10 @@ import { openAPISpecs } from "hono-openapi";
 import api from "./routes/api";
 import internal from "./routes/internal";
 import tags from "./tags";
+import { contextStorage } from "hono/context-storage";
 
 const app = new Hono<{ Bindings: Env }>();
-
+app.use(contextStorage());
 app.route("/internal", internal);
 app.route("/api", api);
 

@@ -1,3 +1,4 @@
 export default {
-    Internal: "internal"
+    Internal: "internal",
+    Rules: "rules"
 }
