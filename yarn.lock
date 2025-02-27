@@ -1221,6 +1221,11 @@ dot-prop@^7.2.0:
   dependencies:
     type-fest "^2.11.2"
 
+drizzle-orm@^0.40.0:
+  version "0.40.0"
+  resolved "https://registry.npmjs.org/drizzle-orm/-/drizzle-orm-0.40.0.tgz#bdcc58d3340ef14e592c6b6c65db89448b08def9"
+  integrity sha512-7ptk/HQiMSrEZHnAsSlBESXWj52VwgMmyTEfoNmpNN2ZXpcz13LwHfXTIghsAEud7Z5UJhDOp8U07ujcqme7wg==
+
 duplexer@~0.1.1:
   version "0.1.2"
   resolved "https://registry.npmjs.org/duplexer/-/duplexer-0.1.2.tgz#3abe43aef3835f8ae077d136ddce0f276b0400e6"
@@ -1888,6 +1893,11 @@ postcss@^8.4.43:
     nanoid "^3.3.8"
     picocolors "^1.1.1"
     source-map-js "^1.2.1"
+
+postgres@^3.4.5:
+  version "3.4.5"
+  resolved "https://registry.npmjs.org/postgres/-/postgres-3.4.5.tgz#1ef99e51b0ba9b53cbda8a215dd406725f7d15f9"
+  integrity sha512-cDWgoah1Gez9rN3H4165peY9qfpEo+SA61oQv65O3cRUE1pOEoJWwddwcqKE8XZYjbblOJlYDlLV4h67HrEVDg==
 
 printable-characters@^1.0.42:
   version "1.0.42"
