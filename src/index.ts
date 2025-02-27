@@ -35,6 +35,10 @@ app.use(
 					{
 						name: tags.Internal,
 						description: "Endpoints for internal operations."
+					},
+					{
+						name: tags.Rules,
+						description: "Endpoints for Game Manual Rules"
 					}
 				]
 			},

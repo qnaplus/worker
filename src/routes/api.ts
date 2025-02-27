@@ -1,11 +1,11 @@
 import { vValidator } from '@hono/valibot-validator';
-import { arrayContains } from 'drizzle-orm';
+import { and, arrayContains, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { describeRoute } from 'hono-openapi';
 import { resolver } from 'hono-openapi/valibot';
 import { array, object, string } from 'valibot';
 import { db } from '../db';
-import { questions } from '../db/schema';
+import { metadata as dbMetadata, questions } from '../db/schema';
 import { questionSchema } from '../schemas';
 import tags from '../tags';
 import { trycatch } from '../utils';
@@ -13,7 +13,7 @@ import { trycatch } from '../utils';
 const api = new Hono<{ Bindings: Env }>();
 
 api.get(
-    "/rules/qnas/:id",
+    "/rules/qnas",
     describeRoute({
         description: "Get all Q&As tagged with a specific rule",
         responses: {
@@ -32,19 +32,32 @@ api.get(
         tags: [tags.Rules]
     }),
     vValidator(
-        "param",
+        "query",
         object({
-            id: string()
+            rule: string()
         })
     ),
     async (c) => {
-        const { id } = c.req.valid("param");
+        const { rule } = c.req.valid("query");
+        const metadata = await trycatch(
+            db().query.metadata
+                .findFirst({
+                    where: eq(dbMetadata.id, 0)
+                })
+        );
+        if (!metadata.ok || metadata.result === undefined) {
+            return c.status(500);
+        }
+        const { currentSeason } = metadata.result;
         const { error, ok, result } = await trycatch(
             db()
                 .select()
                 .from(questions)
                 .where(
-                    arrayContains(questions.tags, [id])
+                    and(
+                        arrayContains(questions.tags, [rule]),
+                        eq(questions.season, currentSeason)
+                    )
                 )
         );
         if (!ok) {
