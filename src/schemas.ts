@@ -9,8 +9,8 @@ export const slimQuestionSchema = type({
     season: "string",
     askedTimestamp: "string",
     askedTimestampMs: "number",
-    answeredTimestamp: "string",
-    answeredTimestampMs: "number",
+    answeredTimestamp: "string | null",
+    answeredTimestampMs: "number | null",
     answered: "boolean",
     tags: "string[]"
 })

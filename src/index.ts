@@ -41,7 +41,7 @@ app.use(
 				]
 			},
 		});
-		return middleware(c, next);
+		return await middleware(c, next);
 	}
 );
 
@@ -65,7 +65,7 @@ app.get(
 			theme: "saturn",
 			spec: { url: "/openapi" },
 		});
-		return middleware(c, next);
+		return await middleware(c, next);
 	}
 );
 

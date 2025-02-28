@@ -11,9 +11,12 @@ export const internal = new Hono<{ Bindings: Env }>();
 
 internal.use("/*", cors({
     origin: [
-        "https://qnapl.us",
         "https://dev.qnapl.us",
-        "http://localhost:5173"
+        "https://qnapl.us",
+        "https://dev.qnaplus.pages.dev",
+        "https://qnaplus.pages.dev",
+        "http://localhost:5173",
+        "http://localhost:4173"
     ]
 }));
 
@@ -25,19 +28,17 @@ internal.get(
             500: {
                 description: "Server Error"
             },
-            304: {
-                description: "Successful Response - Your client is already up to date."
-            },
             200: {
-                description: "Successful Response - Your client is outdated",
+                description: "Successful Response",
                 content: {
                     "application/json": {
                         schema: resolver(
                             type({
-                                version: "string",
-                                questions: fullQuestionSchema.array()
+                                outdated: "boolean",
+                                "version?": "string",
+                                "questions?": fullQuestionSchema.array()
                             })
-                        )
+                        ),
                     }
                 }
             }
@@ -55,21 +56,21 @@ internal.get(
         const key = `questions-${c.env.ENVIRONMENT}.json`;
         const obj = await c.env.qnaplus.head(key);
         if (obj === null) {
-            return c.status(500)
+            return c.text("Unable to find store.", 500);
         }
         const version = obj.customMetadata?.version;
         if (version === undefined) {
-            return c.status(500)
+            return c.text("Unable to determine store version.", 500);
         }
         if (query.version === version) {
-            return c.status(304);
+            return c.json({ outdated: false });
         }
         const data = await c.env.qnaplus.get(key);
         if (data === null) {
             return c.status(500);
         }
         const questions = await data.json<Question[]>();
-        return c.json({ version, questions });
+        return c.json({ outdated: true, version, questions });
     }
 )
 
