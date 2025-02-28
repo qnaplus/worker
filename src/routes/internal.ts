@@ -10,7 +10,11 @@ import { type } from "arktype";
 export const internal = new Hono<{ Bindings: Env }>();
 
 internal.use("/*", cors({
-    origin: ["https://qnapl.us", "https://dev.qnapl.us"]
+    origin: [
+        "https://qnapl.us",
+        "https://dev.qnapl.us",
+        "http://localhost:5173"
+    ]
 }));
 
 internal.get(
