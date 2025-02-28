@@ -14,7 +14,9 @@
     "url": "git+https://github.com/qnaplus/worker.git"
   },
   "scripts": {
-    "deploy": "wrangler deploy",
+    "deploy": "wrangler deploy -e dev",
+    "deploy:prod": "wrangler deploy",
+    "deploy:all": "yarn deploy && yarn deploy:prod",
     "dev": "wrangler dev",
     "start": "wrangler dev",
     "test": "vitest",

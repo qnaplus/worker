@@ -52,7 +52,11 @@
           "pattern": "dev.api.qnapl.us",
           "custom_domain": true
         }
-      ]
+      ],
+      "assets": {
+        "directory": "./assets/development",
+        "binding": "ASSETS"
+      }
     }
   },
   /**
@@ -71,7 +75,7 @@
    * https://developers.cloudflare.com/workers/static-assets/binding/
    */
   "assets": {
-    "directory": "./assets/",
+    "directory": "./assets/production",
     "binding": "ASSETS"
   }
   /**
