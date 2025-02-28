@@ -1,12 +1,11 @@
-import { vValidator } from '@hono/valibot-validator';
+import { type } from 'arktype';
 import { and, arrayContains, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { describeRoute } from 'hono-openapi';
-import { resolver } from 'hono-openapi/valibot';
-import { array, object, string } from 'valibot';
+import { resolver, validator } from 'hono-openapi/arktype';
 import { db } from '../db';
 import { metadata as dbMetadata, questions } from '../db/schema';
-import { questionSchema } from '../schemas';
+import { slimQuestionSchema } from '../schemas';
 import tags from '../tags';
 import { trycatch } from '../utils';
 
@@ -24,26 +23,26 @@ api.get(
                 description: "Successful Response",
                 content: {
                     "application/json": {
-                        schema: resolver(array(questionSchema))
+                        schema: resolver(slimQuestionSchema)
                     }
                 }
             }
         },
         tags: [tags.Rules]
     }),
-    vValidator(
+    validator(
         "query",
-        object({
-            rule: string()
+        type({
+            rule: "string",
+            "season?": "string"
         })
     ),
     async (c) => {
-        const { rule } = c.req.valid("query");
+        const { season, rule } = c.req.valid("query");
         const metadata = await trycatch(
-            db().query.metadata
-                .findFirst({
-                    where: eq(dbMetadata.id, 0)
-                })
+            db().query.metadata.findFirst({
+                where: eq(dbMetadata.id, 0)
+            })
         );
         if (!metadata.ok || metadata.result === undefined) {
             return c.status(500);
@@ -51,12 +50,23 @@ api.get(
         const { currentSeason } = metadata.result;
         const { error, ok, result } = await trycatch(
             db()
-                .select()
+                .select({
+                    id: questions.id,
+                    author: questions.author,
+                    program: questions.program,
+                    title: questions.title,
+                    season: questions.season,
+                    url: questions.url,
+                    tags: questions.tags,
+                    askedTimestampMs: questions.askedTimestampMs,
+                    answeredTimestampMs: questions.answeredTimestampMs,
+                    answered: questions.answered
+                })
                 .from(questions)
                 .where(
                     and(
                         arrayContains(questions.tags, [rule]),
-                        eq(questions.season, currentSeason)
+                        eq(questions.season, season ?? currentSeason)
                     )
                 )
         );

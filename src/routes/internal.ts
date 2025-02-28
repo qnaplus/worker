@@ -1,14 +1,11 @@
 import { Question } from "@qnaplus/scraper";
 import { Hono } from "hono";
 import { describeRoute } from "hono-openapi";
-import {
-    resolver,
-    validator as vValidator,
-} from "hono-openapi/valibot";
-import { array, object, string } from "valibot";
-import { questionSchema } from "../schemas";
 import { cors } from "hono/cors";
+import { fullQuestionSchema } from "../schemas";
 import tags from "../tags";
+import { resolver, validator } from "hono-openapi/arktype";
+import { type } from "arktype";
 
 export const internal = new Hono<{ Bindings: Env }>();
 
@@ -32,9 +29,9 @@ internal.get(
                 content: {
                     "application/json": {
                         schema: resolver(
-                            object({
-                                version: string(),
-                                questions: array(questionSchema)
+                            type({
+                                version: "string",
+                                questions: fullQuestionSchema.array()
                             })
                         )
                     }
@@ -43,10 +40,10 @@ internal.get(
         },
         tags: [tags.Internal]
     }),
-    vValidator(
+    validator(
         "query",
-        object({
-            version: string()
+        type({
+            version: "string"
         })
     ),
     async (c) => {
