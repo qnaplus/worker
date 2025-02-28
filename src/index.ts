@@ -5,6 +5,7 @@ import api from "./routes/api";
 import internal from "./routes/internal";
 import tags from "./tags";
 import { contextStorage } from "hono/context-storage";
+import vars from "./vars";
 
 const app = new Hono<{ Bindings: Env }>();
 app.use(contextStorage());
@@ -17,18 +18,15 @@ app.use(
 		const middleware = openAPISpecs(app, {
 			documentation: {
 				info: {
-					title: "qnaplus",
+					title: vars("SPECS_TITLE"),
 					version: "1.0.0",
-					description: "API for interacting with Q&A related resources.",
+					description: vars("SPECS_DESCRIPTION"),
+					termsOfService: "Don't spam the API!"
 				},
 				servers: [
 					{
-						url: c.env.ENVIRONMENT === "production"
-							? "https://api.qnapl.us"
-							: "https://dev.api.qnapl.us",
-						description: c.env.ENVIRONMENT === "production"
-							? "Production Server"
-							: "Development Server"
+						url: vars("SERVER_URL"),
+						description: vars("SERVER_DESCRIPTION")
 					}
 				],
 				tags: [
@@ -49,10 +47,26 @@ app.use(
 
 app.get(
 	"/docs",
-	apiReference({
-		theme: "saturn",
-		spec: { url: "/openapi" },
-	})
+	async (c, next) => {
+		const pageTitle = c.env.ENVIRONMENT === "production"
+			? "qnaplus API Reference"
+			: "qnaplus API Reference [dev]";
+		const middleware = apiReference<{ Bindings: Env }>({
+			pageTitle,
+			metaData: {
+				title: pageTitle,
+				description: vars("SPECS_DESCRIPTION"),
+				ogUrl: `${vars("SERVER_URL")}/docs`,
+				ogType: "website",
+				ogTitle: vars("SPECS_TITLE"),
+				ogDescription: vars("SERVER_DESCRIPTION"),
+				ogImage: `${vars("SERVER_URL")}/qnaplus.png`,
+			},
+			theme: "saturn",
+			spec: { url: "/openapi" },
+		});
+		return middleware(c, next);
+	}
 );
 
 export default app
