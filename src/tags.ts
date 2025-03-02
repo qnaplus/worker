@@ -1,4 +1,5 @@
 export default {
     Internal: "internal",
-    Rules: "rules"
+    Rules: "rules",
+    Qna: "Q&A"
 }

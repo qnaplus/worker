@@ -3,7 +3,7 @@ import { and, arrayContains, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { describeRoute } from 'hono-openapi';
 import { resolver, validator } from 'hono-openapi/arktype';
-import { db } from '../db';
+import { db, selectSlimQuestion } from '../db';
 import { metadata as dbMetadata, questions } from '../db/schema';
 import { slimQuestionSchema } from '../schemas';
 import tags from '../tags';
@@ -12,12 +12,15 @@ import { trycatch } from '../utils';
 const api = new Hono<{ Bindings: Env }>();
 
 api.get(
-    "/rules/qnas",
+    "/qnas/:id",
     describeRoute({
-        description: "Get all Q&As tagged with a specific rule",
+        description: "Get the Q&A with the given ID",
         responses: {
             500: {
                 description: "Server Error"
+            },
+            404: {
+                description: "Not Found"
             },
             200: {
                 description: "Successful Response",
@@ -28,53 +31,95 @@ api.get(
                 }
             }
         },
-        tags: [tags.Rules]
+        tags: [tags.Qna]
     }),
     validator(
-        "query",
+        "param",
         type({
-            rule: "string",
-            "season?": "string"
+            id: "string"
         })
     ),
     async (c) => {
-        const { season, rule } = c.req.valid("query");
-        const metadata = await trycatch(
-            db().query.metadata.findFirst({
-                where: eq(dbMetadata.id, 0)
+        const { id } = c.req.valid("param");
+        const { ok, error, result } = await trycatch(
+            db().query.questions.findFirst({
+                where: eq(questions.id, id)
             })
-        );
-        if (!metadata.ok || metadata.result === undefined) {
+        )
+        if (!ok) {
             return c.status(500);
         }
-        const { currentSeason } = metadata.result;
-        const { error, ok, result } = await trycatch(
-            db()
-                .select({
-                    id: questions.id,
-                    author: questions.author,
-                    program: questions.program,
-                    title: questions.title,
-                    season: questions.season,
-                    url: questions.url,
-                    tags: questions.tags,
-                    askedTimestampMs: questions.askedTimestampMs,
-                    answeredTimestampMs: questions.answeredTimestampMs,
-                    answered: questions.answered
-                })
-                .from(questions)
-                .where(
-                    and(
-                        arrayContains(questions.tags, [rule]),
-                        eq(questions.season, season ?? currentSeason)
-                    )
-                )
-        );
-        if (!ok) {
-            return c.text(`${error}`, 500);
+        if (result === undefined) {
+            return c.status(404);
         }
         return c.json(result);
     }
-)
+);
+
+// authors
+
+api.get(
+    "/qnas/from-author",
+    describeRoute({
+        description: "Get the Q&A with the given ID",
+        responses: {
+            500: {
+                description: "Server Error"
+            },
+            404: {
+                description: "Not Found"
+            },
+            200: {
+                description: "Successful Response",
+                content: {
+                    "application/json": {
+                        schema: resolver(slimQuestionSchema.array())
+                    }
+                }
+            }
+        },
+        tags: [tags.Qna]
+    }),
+    validator(
+        "param",
+        type({
+            author: "string"
+        })
+    ),
+    async (c) => {
+        const { author } = c.req.valid("param");
+        const { ok, error, result } = await trycatch(
+            selectSlimQuestion()
+                .where(eq(questions.author, author))
+        )
+        if (!ok) {
+            return c.status(500);
+        }
+        return c.json(result);
+    }
+);
+
+api.get(
+    "/qnas/recent",
+    describeRoute({
+        description: "Get the Q&A with the given ID",
+        responses: {
+            500: {
+                description: "Server Error"
+            },
+            200: {
+                description: "Successful Response",
+                content: {
+                    "application/json": {
+                        schema: resolver(slimQuestionSchema.array())
+                    }
+                }
+            }
+        },
+        tags: [tags.Qna]
+    }),
+    async (c) => {
+    }
+);
 
 export default api;
