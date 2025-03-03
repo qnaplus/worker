@@ -36,8 +36,12 @@ app.use(
 					},
 					{
 						name: tags.Rules,
-						description: "Endpoints for Game Manual Rules"
-					}
+						description: "Endpoints for Game Manual related operations"
+					},
+					{
+						name: tags.Qna,
+						description: "Endpoints for Q&A related operations"
+					},
 				]
 			},
 		});

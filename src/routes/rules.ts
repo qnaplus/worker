@@ -12,7 +12,7 @@ import { trycatch } from "../utils";
 const rules = new Hono<{ Bindings: Env }>();
 
 rules.get(
-    "/rules/:rule/qnas",
+    "/:rule/qnas",
     describeRoute({
         description: "Get all Q&As tagged with a specific rule",
         responses: {
@@ -70,3 +70,4 @@ rules.get(
     }
 );
 
+export default rules;
