@@ -56,8 +56,6 @@ qnas.get(
     }
 );
 
-// authors
-
 qnas.get(
     "/from-author",
     describeRoute({
