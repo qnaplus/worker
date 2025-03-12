@@ -91,6 +91,7 @@ qnas.get(
                 .where(eq(questions.author, author))
         )
         if (!ok) {
+            console.error(error);
             return c.status(500);
         }
         return c.json(result);
@@ -123,6 +124,7 @@ qnas.get(
               .limit(20)
         )
         if (!ok) {
+            console.error(error);
             return c.status(500);
         }
         return c.json(result);
