@@ -11,6 +11,40 @@ import { Hono } from "hono";
 
 export const qnas = new Hono<{ Bindings: Env }>();
 
+
+qnas.get(
+    "/recently-asked",
+    describeRoute({
+        description: "Get the 20 most recently asked Q&As",
+        responses: {
+            500: {
+                description: "Server Error"
+            },
+            200: {
+                description: "Successful Response",
+                content: {
+                    "application/json": {
+                        schema: resolver(slimQuestionSchema.array())
+                    }
+                }
+            }
+        },
+        tags: [tags.Qna]
+    }),
+    async (c) => {
+        const { ok, error, result } = await trycatch(
+            selectSlimQuestion()
+              .orderBy(desc(questions.askedTimestampMs))
+              .limit(20)
+        )
+        if (!ok) {
+            console.error(error);
+            return c.text(`An error occurred while fetching recently asked questions`, 500);
+        }
+        return c.json(result);
+    }
+);
+
 qnas.get(
     "/:id",
     describeRoute({
@@ -94,39 +128,6 @@ qnas.get(
         if (!ok) {
             console.error(error);
             return c.text(`An error occurred while fetching questions authored by ${author}`, 500);
-        }
-        return c.json(result);
-    }
-);
-
-qnas.get(
-    "/recently-asked",
-    describeRoute({
-        description: "Get the 20 most recently asked Q&As",
-        responses: {
-            500: {
-                description: "Server Error"
-            },
-            200: {
-                description: "Successful Response",
-                content: {
-                    "application/json": {
-                        schema: resolver(slimQuestionSchema.array())
-                    }
-                }
-            }
-        },
-        tags: [tags.Qna]
-    }),
-    async (c) => {
-        const { ok, error, result } = await trycatch(
-            selectSlimQuestion()
-              .orderBy(desc(questions.askedTimestampMs))
-              .limit(20)
-        )
-        if (!ok) {
-            console.error(error);
-            return c.text(`An error occurred while fetching recently asked questions`, 500);
         }
         return c.json(result);
     }
