@@ -4,10 +4,10 @@ import postgres from "postgres";
 import { lazy } from "../utils";
 import * as schema from "./schema"
 
-const pg = lazy(() => {
+const pg = () => {
     const ctx = getContext<{ Bindings: Env }>();
     return postgres(ctx.env.DB_CONNECTION_URL);
-});
+};
 
 export const db = () => drizzle({ schema, client: pg() });
 
