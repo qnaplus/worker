@@ -51,7 +51,7 @@ rules.get(
             })
         );
         if (!metadata.ok || metadata.result === undefined) {
-            return c.status(500);
+            return c.text("", 500);
         }
         const { currentSeason } = metadata.result;
         const { error, ok, result } = await trycatch(

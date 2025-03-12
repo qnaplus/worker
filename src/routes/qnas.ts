@@ -47,10 +47,11 @@ qnas.get(
             })
         )
         if (!ok) {
-            return c.status(500);
+            console.error(error);
+            return c.text(`An error occurred while fetching question with id ${id}`, 500);
         }
         if (result === undefined) {
-            return c.status(404);
+            return c.text(`No question with id ${id} was found.`, 404);
         }
         return c.json(result);
     }
@@ -92,7 +93,7 @@ qnas.get(
         )
         if (!ok) {
             console.error(error);
-            return c.status(500);
+            return c.text(`An error occurred while fetching questions authored by ${author}`, 500);
         }
         return c.json(result);
     }
@@ -125,7 +126,7 @@ qnas.get(
         )
         if (!ok) {
             console.error(error);
-            return c.text("", 500);
+            return c.text(`An error occurred while fetching recently asked questions`, 500);
         }
         return c.json(result);
     }
