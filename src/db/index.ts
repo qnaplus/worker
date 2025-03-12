@@ -9,7 +9,7 @@ const pg = lazy(() => {
     return postgres(ctx.env.DB_CONNECTION_URL);
 });
 
-export const db = lazy(() => drizzle({ schema, client: pg() }));
+export const db = () => drizzle({ schema, client: pg() });
 
 export const selectSlimQuestion = () => {
     return db()
