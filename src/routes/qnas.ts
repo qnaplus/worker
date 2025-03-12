@@ -1,5 +1,5 @@
 import { type } from "arktype";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { describeRoute } from "hono-openapi";
 import { resolver, validator } from "hono-openapi/arktype";
 import { db, selectSlimQuestion } from "../db";
@@ -98,9 +98,9 @@ qnas.get(
 );
 
 qnas.get(
-    "/recent",
+    "/recently-asked",
     describeRoute({
-        description: "Get the Q&A with the given ID",
+        description: "Get the 20 most recently asked Q&As",
         responses: {
             500: {
                 description: "Server Error"
@@ -117,6 +117,15 @@ qnas.get(
         tags: [tags.Qna]
     }),
     async (c) => {
+        const { ok, error, result } = await trycatch(
+            selectSlimQuestion()
+              .orderBy(desc(questions.askedTimestampMs))
+              .limit(20)
+        )
+        if (!ok) {
+            return c.status(500);
+        }
+        return c.json(result);
     }
 );
 
