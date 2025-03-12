@@ -125,7 +125,7 @@ qnas.get(
         )
         if (!ok) {
             console.error(error);
-            return c.status(500);
+            return c.text("", 500);
         }
         return c.json(result);
     }
