@@ -1,5 +1,5 @@
 import { type } from "arktype";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, isNotNull } from "drizzle-orm";
 import { describeRoute } from "hono-openapi";
 import { resolver, validator } from "hono-openapi/arktype";
 import { db, selectSlimQuestion } from "../db";
@@ -34,8 +34,9 @@ qnas.get(
     async (c) => {
         const [error, result] = await trycatch(() =>
             selectSlimQuestion()
-              .orderBy(desc(questions.answeredTimestampMs))
-              .limit(20)
+                .where(isNotNull(questions.answeredTimestampMs))
+                .orderBy(desc(questions.answeredTimestampMs))
+                .limit(20)
         )
         if (error) {
             console.error(error);
@@ -67,8 +68,8 @@ qnas.get(
     async (c) => {
         const [error, result] = await trycatch(() =>
             selectSlimQuestion()
-              .orderBy(desc(questions.askedTimestampMs))
-              .limit(20)
+                .orderBy(desc(questions.askedTimestampMs))
+                .limit(20)
         )
         if (error) {
             console.error(error);
