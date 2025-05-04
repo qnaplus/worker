@@ -1,32 +1,14 @@
-export type TryResultSuccess<T> = {
-	ok: true;
-	result: T;
-	error: null;
-};
-
-export type TryResultFailure = {
-	ok: false;
-	result: null;
-	error: unknown;
-};
-
+export type TryResultSuccess<T> = [null, T];
+export type TryResultFailure = [Error, null];
 export type TryResult<T> = TryResultSuccess<T> | TryResultFailure;
 
 export const trycatch = async <T>(
-	promise: Promise<T>,
+	promise: () => Promise<T>,
 ): Promise<TryResult<T>> => {
 	try {
-		const result = await promise;
-		return {
-			ok: true,
-			result,
-			error: null,
-		};
+		const result = await promise();
+		return [null, result]
 	} catch (e) {
-		return {
-			ok: false,
-			result: null,
-			error: e,
-		};
+		return [e as Error, null]
 	}
 };

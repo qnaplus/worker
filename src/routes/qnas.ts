@@ -13,6 +13,39 @@ export const qnas = new Hono<{ Bindings: Env }>();
 
 
 qnas.get(
+    "/recently-answered",
+    describeRoute({
+        description: "Get the 20 most recently answered Q&As",
+        responses: {
+            500: {
+                description: "Server Error"
+            },
+            200: {
+                description: "Successful Response",
+                content: {
+                    "application/json": {
+                        schema: resolver(slimQuestionSchema.array())
+                    }
+                }
+            }
+        },
+        tags: [tags.Qna]
+    }),
+    async (c) => {
+        const [error, result] = await trycatch(() =>
+            selectSlimQuestion()
+              .orderBy(desc(questions.answeredTimestampMs))
+              .limit(20)
+        )
+        if (error) {
+            console.error(error);
+            return c.text(`An error occurred while fetching recently answered questions`, 500);
+        }
+        return c.json(result);
+    }
+);
+
+qnas.get(
     "/recently-asked",
     describeRoute({
         description: "Get the 20 most recently asked Q&As",
@@ -32,12 +65,12 @@ qnas.get(
         tags: [tags.Qna]
     }),
     async (c) => {
-        const { ok, error, result } = await trycatch(
+        const [error, result] = await trycatch(() =>
             selectSlimQuestion()
               .orderBy(desc(questions.askedTimestampMs))
               .limit(20)
         )
-        if (!ok) {
+        if (error) {
             console.error(error);
             return c.text(`An error occurred while fetching recently asked questions`, 500);
         }
@@ -75,12 +108,12 @@ qnas.get(
     ),
     async (c) => {
         const { id } = c.req.valid("param");
-        const { ok, error, result } = await trycatch(
+        const [error, result] = await trycatch(() =>
             db().query.questions.findFirst({
                 where: eq(questions.id, id)
             })
         )
-        if (!ok) {
+        if (error) {
             console.error(error);
             return c.text(`An error occurred while fetching question with id ${id}`, 500);
         }
@@ -121,11 +154,11 @@ qnas.get(
     ),
     async (c) => {
         const { author } = c.req.valid("param");
-        const { ok, error, result } = await trycatch(
+        const [error, result] = await trycatch(() =>
             selectSlimQuestion()
                 .where(eq(questions.author, author))
         )
-        if (!ok) {
+        if (error) {
             console.error(error);
             return c.text(`An error occurred while fetching questions authored by ${author}`, 500);
         }

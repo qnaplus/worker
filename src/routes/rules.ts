@@ -45,16 +45,16 @@ rules.get(
     async (c) => {
         const { season } = c.req.valid("query");
         const { rule } = c.req.valid("param");
-        const metadata = await trycatch(
+        const [metadataError, metadata] = await trycatch(() =>
             db().query.metadata.findFirst({
                 where: eq(dbMetadata.id, 0)
             })
         );
-        if (!metadata.ok || metadata.result === undefined) {
+        if (metadataError === null || !metadata) {
             return c.text("", 500);
         }
-        const { currentSeason } = metadata.result;
-        const { error, ok, result } = await trycatch(
+        const { currentSeason } = metadata;
+        const  [queryError, result] = await trycatch(() =>
             selectSlimQuestion()
                 .where(
                     and(
@@ -63,8 +63,8 @@ rules.get(
                     )
                 )
         );
-        if (!ok) {
-            return c.text(`${error}`, 500);
+        if (queryError) {
+            return c.text(`${queryError}`, 500);
         }
         return c.json(result);
     }
