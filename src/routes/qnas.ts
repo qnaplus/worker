@@ -1,13 +1,14 @@
-import { type } from "arktype";
+import 'zod-openapi/extend';
 import { desc, eq, isNotNull } from "drizzle-orm";
 import { describeRoute } from "hono-openapi";
-import { resolver, validator } from "hono-openapi/arktype";
+import { resolver, validator } from "hono-openapi/zod";
 import { db, selectSlimQuestion } from "../db";
 import { questions } from "../db/schema";
 import { slimQuestionSchema } from "../schemas";
 import tags from "../tags";
 import { trycatch } from "../utils";
 import { Hono } from "hono";
+import { z } from "zod";
 
 export const qnas = new Hono<{ Bindings: Env }>();
 
@@ -103,8 +104,8 @@ qnas.get(
     }),
     validator(
         "param",
-        type({
-            id: "string"
+        z.object({
+            id: z.string().openapi({ description: "The ID of the question to fetch" })
         })
     ),
     async (c) => {
@@ -149,8 +150,8 @@ qnas.get(
     }),
     validator(
         "param",
-        type({
-            author: "string"
+        z.object({
+            author: z.string()
         })
     ),
     async (c) => {

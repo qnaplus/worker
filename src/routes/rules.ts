@@ -1,13 +1,13 @@
-import { type } from "arktype";
 import { eq, and, arrayContains } from "drizzle-orm";
 import { Hono } from "hono";
 import { describeRoute } from "hono-openapi";
-import { resolver, validator } from "hono-openapi/arktype";
+import { resolver, validator } from "hono-openapi/zod";
 import { db, selectSlimQuestion } from "../db";
 import { questions, metadata as dbMetadata } from "../db/schema";
 import { slimQuestionSchema } from "../schemas";
 import tags from "../tags";
 import { trycatch } from "../utils";
+import { z } from "zod";
 
 const rules = new Hono<{ Bindings: Env }>();
 
@@ -32,14 +32,14 @@ rules.get(
     }),
     validator(
         "param",
-        type({
-            rule: "string",
+        z.object({
+            rule: z.string(),
         })
     ),
     validator(
         "query",
-        type({
-            season: "string?",
+        z.object({
+            season: z.string().optional(),
         })
     ),
     async (c) => {

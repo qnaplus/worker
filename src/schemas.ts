@@ -1,24 +1,24 @@
-import { type } from "arktype";
+import { z } from "zod";
+import 'zod-openapi/extend';
 
-export const slimQuestionSchema = type({
-    id: "string",
-    url: "string",
-    author: "string",
-    program: "string",
-    title: "string",
-    season: "string",
-    askedTimestamp: "string",
-    askedTimestampMs: "number",
-    answeredTimestamp: "string | null",
-    answeredTimestampMs: "number | null",
-    answered: "boolean",
-    tags: "string[]"
+export const slimQuestionSchema = z.object({
+    id: z.string().openapi({ description: "The question's numerical ID" }),
+    url: z.string().openapi({ description: "The url of the question" }),
+    author: z.string().openapi({ description: "The person who asked the question" }),
+    program: z.string().openapi({ description: "The program this question was asked in (e.g., V5RC, VURC, etc)" }),
+    title: z.string().openapi({ description: "The title of the question" }),
+    season: z.string().openapi({ description: "The season this question was asked in (e.g., 2022-2023)" }),
+    askedTimestamp: z.string().openapi({ description: "When this question was asked (in the format DD-Mon-YYYY)" }),
+    askedTimestampMs: z.number().openapi({ description: "The askedTimestamp in milliseconds" }),
+    answeredTimestamp: z.string().nullable().openapi({ description: "When this question was answered (in the format DD-Mon-YYYY)" }),
+    answeredTimestampMs: z.number().nullable().openapi({ description: "The answeredTimestamp in milliseconds" }),
+    answered: z.boolean().openapi({ description: "Whether the question was answered" }),
+    tags: z.string().array().openapi({ description: "Tags added to this question" })
 })
 
-export const fullQuestionSchema = type({
-    "...": slimQuestionSchema,
-    question: "string",
-    questionRaw: "string",
-    answer: "string | null",
-    answerRaw: "string | null"
+export const fullQuestionSchema = slimQuestionSchema.extend({
+    question: z.string().openapi({ description: "The question content as plain text" }),
+    questionRaw: z.string().openapi({ description: "The question content as raw html" }),
+    answer: z.string().nullable().openapi({ description: "The answer content as plain text" }),
+    answerRaw: z.string().nullable().openapi({ description: "The answer content as raw html" })
 });

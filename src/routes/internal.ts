@@ -4,8 +4,8 @@ import { describeRoute } from "hono-openapi";
 import { cors } from "hono/cors";
 import { fullQuestionSchema } from "../schemas";
 import tags from "../tags";
-import { resolver, validator } from "hono-openapi/arktype";
-import { type } from "arktype";
+import { resolver, validator } from "hono-openapi/zod";
+import { z } from "zod";
 
 export const internal = new Hono<{ Bindings: Env }>();
 
@@ -33,10 +33,10 @@ internal.get(
                 content: {
                     "application/json": {
                         schema: resolver(
-                            type({
-                                outdated: "boolean",
-                                "version?": "string",
-                                "questions?": fullQuestionSchema.array()
+                            z.object({
+                                outdated: z.boolean(),
+                                version: z.string().optional(),
+                                questions: fullQuestionSchema.array().optional()
                             })
                         ),
                     }
@@ -47,8 +47,8 @@ internal.get(
     }),
     validator(
         "query",
-        type({
-            version: "string"
+        z.object({
+            version: z.string()
         })
     ),
     async (c) => {
