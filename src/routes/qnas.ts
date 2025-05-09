@@ -81,6 +81,48 @@ qnas.get(
 );
 
 qnas.get(
+    "/from-author",
+    describeRoute({
+        description: "Get the Q&A with the given ID",
+        responses: {
+            500: {
+                description: "Server Error"
+            },
+            404: {
+                description: "Not Found"
+            },
+            200: {
+                description: "Successful Response",
+                content: {
+                    "application/json": {
+                        schema: resolver(slimQuestionSchema.array())
+                    }
+                }
+            }
+        },
+        tags: [tags.Qna]
+    }),
+    validator(
+        "param",
+        z.object({
+            author: z.string()
+        })
+    ),
+    async (c) => {
+        const { author } = c.req.valid("param");
+        const [error, result] = await trycatch(() =>
+            selectSlimQuestion()
+                .where(eq(questions.author, author))
+        )
+        if (error) {
+            console.error(error);
+            return c.text(`An error occurred while fetching questions authored by ${author}`, 500);
+        }
+        return c.json(result);
+    }
+);
+
+qnas.get(
     "/:id",
     describeRoute({
         description: "Get the Q&A with the given ID",
@@ -121,48 +163,6 @@ qnas.get(
         }
         if (result === undefined) {
             return c.text(`No question with id ${id} was found.`, 404);
-        }
-        return c.json(result);
-    }
-);
-
-qnas.get(
-    "/from-author",
-    describeRoute({
-        description: "Get the Q&A with the given ID",
-        responses: {
-            500: {
-                description: "Server Error"
-            },
-            404: {
-                description: "Not Found"
-            },
-            200: {
-                description: "Successful Response",
-                content: {
-                    "application/json": {
-                        schema: resolver(slimQuestionSchema.array())
-                    }
-                }
-            }
-        },
-        tags: [tags.Qna]
-    }),
-    validator(
-        "param",
-        z.object({
-            author: z.string()
-        })
-    ),
-    async (c) => {
-        const { author } = c.req.valid("param");
-        const [error, result] = await trycatch(() =>
-            selectSlimQuestion()
-                .where(eq(questions.author, author))
-        )
-        if (error) {
-            console.error(error);
-            return c.text(`An error occurred while fetching questions authored by ${author}`, 500);
         }
         return c.json(result);
     }
