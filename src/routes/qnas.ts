@@ -105,7 +105,7 @@ qnas.get(
     validator(
         "param",
         z.object({
-            id: z.string().openapi({ description: "The ID of the question to fetch" })
+            id: z.string().openapi({ description: "The question's numerical ID" })
         })
     ),
     async (c) => {

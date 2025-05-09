@@ -33,13 +33,13 @@ rules.get(
     validator(
         "param",
         z.object({
-            rule: z.string(),
+            rule: z.string().openapi({ description: "The rule in shorthand form (e.g., G1)" }),
         })
     ),
     validator(
         "query",
         z.object({
-            season: z.string().optional(),
+            season: z.string().optional().openapi({ description: "The season to get questions from (e.g., 2022-2023). Defaults to the latest season." }),
         })
     ),
     async (c) => {
@@ -54,7 +54,7 @@ rules.get(
             return c.text("", 500);
         }
         const { currentSeason } = metadata;
-        const  [queryError, result] = await trycatch(() =>
+        const [queryError, result] = await trycatch(() =>
             selectSlimQuestion()
                 .where(
                     and(
