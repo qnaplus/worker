@@ -83,7 +83,7 @@ qnas.get(
 qnas.get(
     "/from-author",
     describeRoute({
-        description: "Get the Q&A with the given ID",
+        description: "Get all Q&As with the given author",
         responses: {
             500: {
                 description: "Server Error"
