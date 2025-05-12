@@ -3,6 +3,9 @@
 interface Env {
 	ENVIRONMENT: "production" | "development";
 	DB_CONNECTION_URL: string;
+	LOKI_HOST: string;
+	LOKI_USERNAME: string;
+	LOKI_PASSWORD: string;
 	qnaplus: R2Bucket;
 	ASSETS: Fetcher;
 }

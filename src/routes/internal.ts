@@ -7,7 +7,7 @@ import tags from "../tags";
 import { resolver, validator } from "hono-openapi/zod";
 import { z } from "zod";
 
-export const internal = new Hono<{ Bindings: Env }>();
+const internal = new Hono<{ Bindings: Env }>();
 
 internal.use("/*", cors({
     origin: [

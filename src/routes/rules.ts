@@ -14,7 +14,7 @@ const rules = new Hono<{ Bindings: Env }>();
 rules.get(
     "/:rule/qnas",
     describeRoute({
-        description: "Get all Q&As tagged with a specific rule",
+        description: "Get all Q&As in the current season tagged with a specific rule",
         responses: {
             500: {
                 description: "Server Error"
