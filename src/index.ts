@@ -1,4 +1,4 @@
-import { apiReference } from "@scalar/hono-api-reference";
+import { apiReference, Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
 import { openAPISpecs } from "hono-openapi";
 import api from "./routes/api";
@@ -55,7 +55,7 @@ app.get(
 		const pageTitle = c.env.ENVIRONMENT === "production"
 			? "qnaplus API Reference"
 			: "qnaplus API Reference [dev]";
-		const middleware = apiReference<{ Bindings: Env }>({
+		const middleware = Scalar<{ Bindings: Env }>({
 			pageTitle,
 			metaData: {
 				title: pageTitle,
@@ -67,7 +67,7 @@ app.get(
 				ogImage: `${vars("SERVER_URL")}/qnaplus.png`,
 			},
 			theme: "saturn",
-			spec: { url: "/openapi" },
+			url: "/openapi",
 		});
 		return await middleware(c, next);
 	}

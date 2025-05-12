@@ -43,6 +43,7 @@ rules.get(
         })
     ),
     async (c) => {
+        
         const { season } = c.req.valid("query");
         const { rule } = c.req.valid("param");
         const [metadataError, metadata] = await trycatch(() =>

@@ -81,7 +81,7 @@ qnas.get(
 );
 
 qnas.get(
-    "/from-author",
+    "/from-author/:author",
     describeRoute({
         description: "Get all Q&As with the given author",
         responses: {
