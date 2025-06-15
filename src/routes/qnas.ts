@@ -41,16 +41,13 @@ qnas.get(
         })
     ),
     async (c) => {
-        const { logger } = c.var;
         const { id } = c.req.valid("param");
-        logger.info({ id });
         const [error, result] = await trycatch(() =>
             db().query.questions.findFirst({
                 where: eq(questions.id, id)
             })
         )
         if (error) {
-            logger.error({ err: error });
             return c.text(`An error occurred while fetching question with id ${id}`, 500);
         }
         if (result === undefined) {
