@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import { openAPISpecs } from "hono-openapi";
 import { contextStorage } from "hono/context-storage";
 import { requestId } from "hono/request-id";
-import pino, { Logger } from "pino";
 import api from "./routes/api";
 import internal from "./routes/internal";
 import tags from "./tags";
@@ -13,47 +12,6 @@ import { Variables } from "./types";
 const app = new Hono<{ Bindings: Env, Variables: Variables }>();
 app.use(contextStorage());
 app.use(requestId());
-app.use(async (c, next) => {
-	c.set(
-		"logger",
-		pino({
-			transport: {
-				targets: [
-					{
-						target: "pino-loki",
-						options: {
-							batching: true,
-							interval: 5,
-							labels: {
-								service: "qnaplus-api"
-							},
-							host: c.env.LOKI_HOST,
-							basicAuth: {
-								username: c.env.LOKI_USERNAME,
-								password: c.env.LOKI_PASSWORD,
-							},
-						},
-					}
-				]
-			},
-			// browser: {
-			// 	formatters: {
-			// 		level(label, _number) {
-			// 			return { level: label.toUpperCase() };
-			// 		},
-			// 	},
-			// 	write: (o: any) => {
-			// 		const { time, level, msg } = o;
-			// 		const paddedLevel = level.padEnd(5, ' ');
-			// 		const requestId = c.var.requestId;
-			// 		console.log(`[${time}] ${paddedLevel} (${requestId}): ${msg}`);
-			// 	},
-			// },
-			timestamp: pino.stdTimeFunctions.isoTime,
-		}),
-	);
-	return await next()
-})
 app.route("/internal", internal);
 app.route("/api", api);
 
