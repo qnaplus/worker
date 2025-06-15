@@ -9,9 +9,8 @@ import tags from "../tags";
 import { trycatch } from "../utils";
 import { Hono } from "hono";
 import { z } from "zod";
-import { Variables } from '../types';
 
-const qnas = new Hono<{ Bindings: Env, Variables: Variables }>();
+const qnas = new Hono<{ Bindings: Env }>();
 
 qnas.get(
     "/:id",

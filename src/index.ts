@@ -7,9 +7,8 @@ import api from "./routes/api";
 import internal from "./routes/internal";
 import tags from "./tags";
 import vars from "./vars";
-import { Variables } from "./types";
 
-const app = new Hono<{ Bindings: Env, Variables: Variables }>();
+const app = new Hono<{ Bindings: Env }>();
 app.use(contextStorage());
 app.use(requestId());
 app.route("/internal", internal);
@@ -58,7 +57,7 @@ app.get(
 		const pageTitle = c.env.ENVIRONMENT === "production"
 			? "qnaplus API Reference"
 			: "qnaplus API Reference [dev]";
-		const middleware = Scalar<{ Bindings: Env, Variables: Variables }>({
+		const middleware = Scalar<{ Bindings: Env }>({
 			pageTitle,
 			metaData: {
 				title: pageTitle,
