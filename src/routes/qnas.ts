@@ -13,51 +13,6 @@ import { z } from "zod";
 const qnas = new Hono<{ Bindings: Env }>();
 
 qnas.get(
-    "/:id",
-    describeRoute({
-        description: "Get the Q&A with the given ID",
-        responses: {
-            500: {
-                description: "Server Error"
-            },
-            404: {
-                description: "Not Found"
-            },
-            200: {
-                description: "Successful Response",
-                content: {
-                    "application/json": {
-                        schema: resolver(slimQuestionSchema)
-                    }
-                }
-            }
-        },
-        tags: [tags.Qna]
-    }),
-    validator(
-        "param",
-        z.object({
-            id: z.string().openapi({ description: "The question's numerical ID" })
-        })
-    ),
-    async (c) => {
-        const { id } = c.req.valid("param");
-        const [error, result] = await trycatch(() =>
-            db().query.questions.findFirst({
-                where: eq(questions.id, id)
-            })
-        )
-        if (error) {
-            return c.text(`An error occurred while fetching question with id ${id}`, 500);
-        }
-        if (result === undefined) {
-            return c.text(`No question with id ${id} was found.`, 404);
-        }
-        return c.json(result);
-    }
-);
-
-qnas.get(
     "/recently-asked",
     describeRoute({
         description: "Get the 20 most recently asked Q&As",
@@ -158,6 +113,51 @@ qnas.get(
         if (error) {
             console.error(error);
             return c.text(`An error occurred while fetching questions asked by ${author}`, 500);
+        }
+        return c.json(result);
+    }
+);
+
+qnas.get(
+    "/:id",
+    describeRoute({
+        description: "Get the Q&A with the given ID",
+        responses: {
+            500: {
+                description: "Server Error"
+            },
+            404: {
+                description: "Not Found"
+            },
+            200: {
+                description: "Successful Response",
+                content: {
+                    "application/json": {
+                        schema: resolver(slimQuestionSchema)
+                    }
+                }
+            }
+        },
+        tags: [tags.Qna]
+    }),
+    validator(
+        "param",
+        z.object({
+            id: z.string().openapi({ description: "The question's numerical ID" })
+        })
+    ),
+    async (c) => {
+        const { id } = c.req.valid("param");
+        const [error, result] = await trycatch(() =>
+            db().query.questions.findFirst({
+                where: eq(questions.id, id)
+            })
+        )
+        if (error) {
+            return c.text(`An error occurred while fetching question with id ${id}`, 500);
+        }
+        if (result === undefined) {
+            return c.text(`No question with id ${id} was found.`, 404);
         }
         return c.json(result);
     }
