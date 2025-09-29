@@ -12,3 +12,7 @@ export const trycatch = async <T>(
 		return [e as Error, null]
 	}
 };
+
+export const errorString = (error: Error) => {
+	return `${error.name} ${error.message} ${error.stack}`
+}

@@ -6,7 +6,7 @@ import { db, selectSlimQuestion } from "../db";
 import { questions, metadata as dbMetadata } from "../db/schema";
 import { slimQuestionSchema } from "../schemas";
 import tags from "../tags";
-import { trycatch } from "../utils";
+import { errorString, trycatch } from "../utils";
 import { z } from "zod";
 
 const rules = new Hono<{ Bindings: Env }>();
@@ -51,8 +51,11 @@ rules.get(
                 where: eq(dbMetadata.id, 0)
             })
         );
-        if (metadataError === null || !metadata) {
-            return c.text("", 500);
+        if (metadataError) {
+            return c.text(errorString(metadataError));
+        }
+        if (!metadata) {
+            return c.text("Metadata object is empty.", 500);
         }
         const { currentSeason } = metadata;
         const [queryError, result] = await trycatch(() =>
@@ -65,7 +68,7 @@ rules.get(
                 )
         );
         if (queryError) {
-            return c.text(`${queryError}`, 500);
+            return c.text(errorString(queryError), 500);
         }
         return c.json(result);
     }
