@@ -20,7 +20,9 @@ export const selectSlimQuestion = () => {
             season: schema.questions.season,
             url: schema.questions.url,
             tags: schema.questions.tags,
+            askedTimestamp: schema.questions.askedTimestamp,
             askedTimestampMs: schema.questions.askedTimestampMs,
+            answeredTimestamp: schema.questions.answeredTimestamp,
             answeredTimestampMs: schema.questions.answeredTimestampMs,
             answered: schema.questions.answered
         })
