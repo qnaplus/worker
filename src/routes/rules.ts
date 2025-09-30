@@ -6,7 +6,7 @@ import { db, selectSlimQuestion } from "../db";
 import { questions, metadata as dbMetadata } from "../db/schema";
 import { slimQuestionSchema } from "../schemas";
 import tags from "../tags";
-import { errorString, trycatch } from "../utils";
+import { errorString, isEmptyOrNullish, trycatch } from "../utils";
 import { z } from "zod";
 import { fetchRules } from "../apis/rules";
 
@@ -51,7 +51,7 @@ rules.get(
         })
     ),
     async (c) => {
-        
+
         const { season: inputSeason } = c.req.valid("query");
         const { rule: inputRule } = c.req.valid("param");
         const [metadataError, metadata] = await trycatch(() =>
@@ -65,7 +65,9 @@ rules.get(
         if (!metadata) {
             return c.text("Metadata object is empty.", 500);
         }
-        const season = inputSeason ?? metadata.currentSeason;
+        const season = isEmptyOrNullish(inputSeason)
+            ? metadata.currentSeason
+            : inputSeason;
         const [ruleQuestionsError, ruleQuestions] = await trycatch(() =>
             selectSlimQuestion()
                 .where(
@@ -83,7 +85,9 @@ rules.get(
             console.error(`Unable to resolve rule data (${rulesError})`)
             return c.json(ruleQuestions);
         }
-        const targetRule = rules.ruleGroups.flatMap(group => group.rules).find(({rule}) => rule === `<${inputRule}>`);
+        const targetRule = rules.ruleGroups
+            .flatMap(group => group.rules)
+            .find(({ rule }) => rule === `<${inputRule}>`);
         if (!targetRule) {
             return c.json(ruleQuestions);
         }

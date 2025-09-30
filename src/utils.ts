@@ -16,3 +16,7 @@ export const trycatch = async <T>(
 export const errorString = (error: Error) => {
 	return `${error.name} ${error.message} ${error.stack}`
 }
+
+export type Nullish = null | undefined;
+
+export const isEmptyOrNullish = (input: string | undefined | null): input is Nullish => input === null || input === undefined || input?.trim() === "";
