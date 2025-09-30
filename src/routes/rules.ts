@@ -83,7 +83,7 @@ rules.get(
             console.error(`Unable to resolve rule data (${rulesError})`)
             return c.json(ruleQuestions);
         }
-        const targetRule = rules.ruleGroups.flatMap(group => group.rules).find(({rule}) => rule === inputRule);
+        const targetRule = rules.ruleGroups.flatMap(group => group.rules).find(({rule}) => rule === `<${inputRule}>`);
         if (!targetRule) {
             return c.json(ruleQuestions);
         }
