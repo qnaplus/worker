@@ -1,14 +1,14 @@
-import { eq, and, arrayContains } from "drizzle-orm";
+import { and, arrayContains, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { describeRoute } from "hono-openapi";
 import { resolver, validator } from "hono-openapi/zod";
-import { db, selectSlimQuestion } from "../db";
-import { questions, metadata as dbMetadata } from "../db/schema";
-import { slimQuestionSchema } from "../schemas";
-import tags from "../tags";
-import { errorJson, errorString, isEmptyOrNullish, trycatch } from "../utils";
 import { z } from "zod";
 import { fetchRules } from "../apis/rules";
+import { db, selectSlimQuestion } from "../db";
+import { metadata as dbMetadata, questions } from "../db/schema";
+import { errorSchema, slimQuestionSchema } from "../schemas";
+import tags from "../tags";
+import { errorJson, isEmptyOrNullish, trycatch } from "../utils";
 
 const rules = new Hono<{ Bindings: Env }>();
 
@@ -18,7 +18,12 @@ rules.get(
         description: "Get all Q&As in the current season tagged with a specific rule",
         responses: {
             500: {
-                description: "Server Error"
+                description: "Server Error",
+                content: {
+                    "application/json": {
+                        schema: resolver(errorSchema)
+                    }
+                }
             },
             200: {
                 description: "Successful Response",

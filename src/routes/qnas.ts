@@ -1,14 +1,15 @@
 import 'zod-openapi/extend';
+
 import { desc, eq, isNotNull } from "drizzle-orm";
+import { Hono } from "hono";
 import { describeRoute } from "hono-openapi";
 import { resolver, validator } from "hono-openapi/zod";
+import { z } from "zod";
 import { db, selectSlimQuestion } from "../db";
 import { questions } from "../db/schema";
-import { slimQuestionSchema } from "../schemas";
+import { errorSchema, slimQuestionSchema } from "../schemas";
 import tags from "../tags";
 import { errorJson, trycatch } from "../utils";
-import { Hono } from "hono";
-import { z } from "zod";
 
 const qnas = new Hono<{ Bindings: Env }>();
 
@@ -18,7 +19,12 @@ qnas.get(
         description: "Get the 20 most recently asked Q&As",
         responses: {
             500: {
-                description: "Server Error"
+                description: "Server Error",
+                content: {
+                    "application/json": {
+                        schema: resolver(errorSchema)
+                    }
+                }
             },
             200: {
                 description: "Successful Response",
@@ -50,7 +56,12 @@ qnas.get(
         description: "Get the 20 most recently answered Q&As",
         responses: {
             500: {
-                description: "Server Error"
+                description: "Server Error",
+                content: {
+                    "application/json": {
+                        schema: resolver(errorSchema)
+                    }
+                }
             },
             200: {
                 description: "Successful Response",
@@ -83,7 +94,12 @@ qnas.get(
         description: "Get all Q&As asked by the given author",
         responses: {
             500: {
-                description: "Server Error"
+                description: "Server Error",
+                content: {
+                    "application/json": {
+                        schema: resolver(errorSchema)
+                    }
+                }
             },
             200: {
                 description: "Successful Response",
@@ -121,10 +137,20 @@ qnas.get(
         description: "Get the Q&A with the given ID",
         responses: {
             500: {
-                description: "Server Error"
+                description: "Server Error",
+                content: {
+                    "application/json": {
+                        schema: resolver(errorSchema)
+                    }
+                }
             },
             404: {
-                description: "Not Found"
+                description: "Not Found",
+                content: {
+                    "application/json": {
+                        schema: resolver(errorSchema)
+                    }
+                }
             },
             200: {
                 description: "Successful Response",

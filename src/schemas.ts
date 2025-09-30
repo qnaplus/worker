@@ -1,5 +1,6 @@
-import { z } from "zod";
 import 'zod-openapi/extend';
+
+import { z } from "zod";
 
 export const slimQuestionSchema = z.object({
     id: z.string().openapi({ description: "The question's numerical ID" }),
@@ -46,3 +47,8 @@ export const refereeFyiRulesSchema = z.object({
         })
     )
 });
+
+export const errorSchema = z.object({
+    message: z.string(),
+    error: z.string().nullable()
+})
