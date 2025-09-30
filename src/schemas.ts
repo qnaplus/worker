@@ -40,7 +40,7 @@ export const refereeFyiRulesSchema = z.object({
                     rule: z.string(),
                     description: z.string(),
                     link: z.string(),
-                    icon: z.string().nullable()
+                    icon: z.string().optional()
                 })
             )
         })
