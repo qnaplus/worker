@@ -85,7 +85,7 @@ rules.get(
             .flatMap(group => group.rules)
             .find(({ rule }) => rule === `<${inputRule}>`);
         if (!targetRule) {
-            return c.json(errorJson(`Unable to find rule '<${inputRule}>`), 404);
+            return c.json(errorJson(`Unable to find rule '<${inputRule}>'`), 404);
         }
 
         const [ruleQuestionsError, ruleQuestions] = await trycatch(() =>
