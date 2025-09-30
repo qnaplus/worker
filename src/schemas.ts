@@ -22,3 +22,27 @@ export const fullQuestionSchema = slimQuestionSchema.extend({
     answer: z.string().nullable().openapi({ description: "The answer content as plain text" }),
     answerRaw: z.string().nullable().openapi({ description: "The answer content as raw html" })
 });
+
+export const refereeFyiRulesSchema = z.object({
+    title: z.string(),
+    season: z.string(),
+    links: z.object({
+        manual: z.string(),
+        qna: z.string()
+    }),
+    programs: z.string().array(),
+    ruleGroups: z.array(
+        z.object({
+            name: z.string(),
+            programs: z.string().array(),
+            rules: z.array(
+                z.object({
+                    rule: z.string(),
+                    description: z.string(),
+                    link: z.string(),
+                    icon: z.string().nullable()
+                })
+            )
+        })
+    )
+});
