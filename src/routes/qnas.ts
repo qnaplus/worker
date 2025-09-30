@@ -6,7 +6,7 @@ import { db, selectSlimQuestion } from "../db";
 import { questions } from "../db/schema";
 import { slimQuestionSchema } from "../schemas";
 import tags from "../tags";
-import { trycatch } from "../utils";
+import { errorJson, trycatch } from "../utils";
 import { Hono } from "hono";
 import { z } from "zod";
 
@@ -38,8 +38,7 @@ qnas.get(
                 .limit(20)
         )
         if (error) {
-            console.error(error);
-            return c.text(`An error occurred while fetching recently asked questions`, 500);
+            return c.json(errorJson(`An error occurred while fetching recently asked questions`, error), 500);
         }
         return c.json(result);
     }
@@ -72,8 +71,7 @@ qnas.get(
                 .limit(20)
         )
         if (error) {
-            console.error(error);
-            return c.text(`An error occurred while fetching recently answered questions`, 500);
+            return c.json(errorJson(`An error occurred while fetching recently answered questions`, error), 500);
         }
         return c.json(result);
     }
@@ -111,8 +109,7 @@ qnas.get(
                 .where(eq(questions.author, author))
         )
         if (error) {
-            console.error(error);
-            return c.text(`An error occurred while fetching questions asked by ${author}`, 500);
+            return c.json(errorJson(`An error occurred while fetching questions asked by ${author}`, error), 500);
         }
         return c.json(result);
     }
@@ -154,10 +151,10 @@ qnas.get(
             })
         )
         if (error) {
-            return c.text(`An error occurred while fetching question with id ${id}`, 500);
+            return c.json(errorJson(`An error occurred while fetching question with id ${id}`, error), 500);
         }
         if (result === undefined) {
-            return c.text(`No question with id ${id} was found.`, 404);
+            return c.json(errorJson(`No question with id ${id} was found.`), 404);
         }
         return c.json(result);
     }

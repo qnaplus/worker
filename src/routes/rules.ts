@@ -6,7 +6,7 @@ import { db, selectSlimQuestion } from "../db";
 import { questions, metadata as dbMetadata } from "../db/schema";
 import { slimQuestionSchema } from "../schemas";
 import tags from "../tags";
-import { errorString, isEmptyOrNullish, trycatch } from "../utils";
+import { errorJson, errorString, isEmptyOrNullish, trycatch } from "../utils";
 import { z } from "zod";
 import { fetchRules } from "../apis/rules";
 
@@ -60,14 +60,29 @@ rules.get(
             })
         );
         if (metadataError) {
-            return c.text(errorString(metadataError));
+            return c.json(errorJson("Unable to resolve metadata for request, please try again later.", metadataError), 500);
         }
         if (!metadata) {
-            return c.text("Metadata object is empty.", 500);
+            return c.json(errorJson("Metadata object is empty."), 500);
         }
         const season = isEmptyOrNullish(inputSeason)
             ? metadata.currentSeason
             : inputSeason;
+
+        const [rulesError, rules] = await trycatch(() => fetchRules(season));
+        if (rulesError) {
+            return c.json(errorJson("An error occurred while fetching rules.", rulesError), 500);
+        }
+        if (rules === null) {
+            return c.json(errorJson("Unable to resolve rule data."), 500);
+        }
+        const targetRule = rules.ruleGroups
+            .flatMap(group => group.rules)
+            .find(({ rule }) => rule === `<${inputRule}>`);
+        if (!targetRule) {
+            return c.json(errorJson(`Unable to find rule '<${inputRule}>`), 404);
+        }
+
         const [ruleQuestionsError, ruleQuestions] = await trycatch(() =>
             selectSlimQuestion()
                 .where(
@@ -78,19 +93,9 @@ rules.get(
                 )
         );
         if (ruleQuestionsError) {
-            return c.text(errorString(ruleQuestionsError), 500);
+            return c.json(errorJson(`Unable to fetch corresponding Q&As for rule <${inputRule}>`, ruleQuestionsError), 500);
         }
-        const [rulesError, rules] = await trycatch(() => fetchRules(season));
-        if (rulesError || rules === null) {
-            console.error(`Unable to resolve rule data (${rulesError})`)
-            return c.json(ruleQuestions);
-        }
-        const targetRule = rules.ruleGroups
-            .flatMap(group => group.rules)
-            .find(({ rule }) => rule === `<${inputRule}>`);
-        if (!targetRule) {
-            return c.json(ruleQuestions);
-        }
+
         return c.json({
             rule: targetRule.rule,
             description: targetRule.description,

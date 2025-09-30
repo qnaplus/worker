@@ -20,3 +20,10 @@ export const errorString = (error: Error) => {
 export type Nullish = null | undefined;
 
 export const isEmptyOrNullish = (input: string | undefined | null): input is Nullish => input === null || input === undefined || input?.trim() === "";
+
+export const errorJson = (message: string, error?: Error) => {
+	return {
+		message,
+		error: error ? errorString(error) : null
+	}
+}
